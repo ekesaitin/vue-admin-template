@@ -1,0 +1,108 @@
+.ff-form {
+    .icon-tool_close {
+      cursor: pointer;
+    }
+    
+    .row {
+      margin-bottom: 25px;
+      
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+      
+      &:last-of-type {
+        margin-bottom: 0;
+      }
+    }
+    
+    .arf-row {
+      margin-top: 15px;
+      margin-bottom: 0;
+    }
+
+    .add-btn {
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .icons {
+      width: 80px;
+      padding-left: 20px;
+    }
+    
+    .title {
+      font-size: 18px;
+      font-family: PingFang SC;
+      font-weight: 400;
+      padding: 8px 0;
+    }
+    
+    .arf-icon {
+      font-size: 20px;
+      cursor: pointer;
+
+      &.el-icon-remove {
+        color: #e57470;
+      }
+
+      &.el-icon-circle-plus {
+        color: #4091f7;
+      }
+    }
+
+    &.labelNotTop ::v-deep .el-form-item {
+      display: flex;
+      margin: 0;
+      width: 100%;
+    }
+
+    & .el-form--inline {
+      .el-form-item {
+        display: flex;
+      }
+    }
+    
+    & ::v-deep .el-form-item {
+      .el-form-item__label {
+        white-space: nowrap;
+        font-size: 14px;
+        font-family: PingFang SC;
+        white-space: nowrap;
+      }
+      
+      .el-form-item__content {
+        flex: 1 1 auto;
+        max-width: 100%;
+        height: auto;
+        
+        * {
+          font-size: 14px;
+          font-family: PingFang SC;
+        }
+        
+        .iconfont {
+          font-size: 18px;
+        }
+        
+        .el-input__inner,
+        .el-textarea__inner {
+          background-color: transparent;
+        }
+      }
+    }
+    
+    .handlers {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 30px;
+      
+      .btn {
+        width: 200px;
+        
+        & + .btn {
+          margin-left: 30px;
+        }
+      }
+    }
+  }
