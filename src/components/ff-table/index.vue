@@ -1,13 +1,13 @@
 <template>
   <div class="ff-table">
-    <el-table v-bind="{ ...$attrs, ...$props }" :data="tableData">
+    <el-table v-bind="allProps" :data="tableData">
       <el-table-column
         v-for="(item, index) in columns"
         :key="index"
-        v-bind="item"
+        v-bind="omit(item, 'slot')"
       >
-        <template v-if="item.slotName" #default="scope">
-          <slot v-bind="scope" :name="item.slotName"></slot>
+        <template v-if="item.slot" #default="scope">
+          <slot v-bind="scope" :name="item.slot"></slot>
         </template>
       </el-table-column>
       <el-table-column v-if="edit || del" label="操作">

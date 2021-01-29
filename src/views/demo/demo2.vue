@@ -1,7 +1,6 @@
 <template>
   <div class="demo2">
-    <p>2222</p>
-    {{$route.params.id}}
+   <el-button type="primary">add</el-button>
   </div>
 </template>
 
@@ -10,7 +9,8 @@ export default {
   name: 'demo2',
   data: () => ({
     
-  })
+  }),
+  methods: {}
 }
 </script>
 

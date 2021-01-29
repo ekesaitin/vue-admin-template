@@ -18,7 +18,6 @@ service.interceptors.request.use(
     // if (token) {
     //   config.headers['token'] = token
     // }
-    console.log('config====', config)
     return config
   },
   error => {

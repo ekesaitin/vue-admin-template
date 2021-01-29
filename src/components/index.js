@@ -2,7 +2,7 @@
  * @Description: 将 @/components下的index.vue 自动注册全局组件，组件名为index.vue所在文件夹名
  * @Author: 贰伍伍
  * @Email: ouhuangff@163.com
- * @LastEditTime: 2021-01-20 15:58:15
+ * @LastEditTime: 2021-01-29 11:24:54
  */
 import Vue from 'vue'
 import camelCase from 'lodash/camelCase'

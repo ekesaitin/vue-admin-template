@@ -37,6 +37,7 @@
                   :_arfItem="arfItem"
                   :_arfIdx="arfIdx"
                   @arf-item-change="_arfChangeCb(row)"
+                  @model-change="emitModelChange"
                 >
                   <template
                     v-for="(_, slotName) in $scopedSlots"
@@ -142,7 +143,6 @@
         <el-button
           v-if="cancel"
           class="btn cancel"
-          type="info"
           @click="_handleCancel"
         >{{ cancelText }}</el-button>
         <el-button
@@ -151,6 +151,12 @@
           type="primary"
           @click="_handleConfirm"
         >{{ confirmText }}</el-button>
+        <el-button
+          v-if="submit"
+          class="btn submit"
+          type="primary"
+          @click="_handleSubmit"
+        >{{ submitText }}</el-button>
         <slot name="appendBtn"></slot>
       </div>
     </el-form>
@@ -277,7 +283,7 @@ import { omit, cloneDeep } from 'lodash'
 import components from './formComps'
 
 /**
- * 将单行配置转为正常的config格式
+ * 将简化的单行配置转为组件可用的config格式
  * @param {object[]} config 单行配置
  * @return {object[]}
  */
@@ -294,15 +300,16 @@ export default {
       const w = label.style.width
       if (w) {
         label.style.minWidth = label.style.maxWidth = w
-        el.getElementsByClassName(
-          'el-form-item__content'
-        )[0].style.marginLeft = 0
+        el.getElementsByClassName('el-form-item__content')[0].style.marginLeft = 0
       }
     }
   },
   components,
   provide () {
     return { ffForm: this }
+  },
+  inject: {
+    rootForm: { default: 'ffForm', from: 'ffForm' }
   },
   props: {
     model: {
@@ -321,13 +328,21 @@ export default {
       type: Boolean,
       default: false
     },
+    submit: {
+      type: Boolean,
+      default: false
+    },
     cancelText: {
       type: String,
-      default: '取 消'
+      default: '取消'
     },
     confirmText: {
       type: String,
-      default: '确 定'
+      default: '确定'
+    },
+    submitText: {
+      type: String,
+      default: '递交'
     },
     clearable: {
       type: Boolean,
@@ -391,6 +406,9 @@ export default {
         paddingLeft: p,
         paddingRight: p
       }
+    },
+    rootConfig () {
+      return this.rootForm.config.find(c => c.config === this.config)
     }
   },
   watch: {
@@ -399,9 +417,19 @@ export default {
         this.$emit('arf-item-change', _arfItem)
       },
       deep: true
+    },
+    model: {
+      handler () {
+        this.emitModelChange()
+      },
+      deep: true
     }
   },
   methods: {
+    /** 通知父组件表单数据改变 */
+    emitModelChange () {
+      this.$emit('model-change')
+    },
     _omit: omit,
     /**
      * 动态表单改变后的回调
@@ -513,6 +541,15 @@ export default {
         .catch((_) => {
         })
     },
+    /**点击递交按钮*/
+    _handleSubmit () {
+      this.validateAll()
+        .then(() => {
+          this.$emit('submit')
+        })
+        .catch((_) => {
+        })
+    },
     /**对整个表单(不包括动态表单)进行校验的方法*/
     validate (...args) {
       return this.$refs.form.validate(...args)
@@ -522,8 +559,12 @@ export default {
       return this.$refs.form.validateField(...args)
     },
     /**将表单字段重置为初始值*/
-    resetFieldsData () {
-      const form = this.formData
+    resetFieldsData (initialModel) {
+      const form = this.copy(initialModel || this.formData)
+      if (this._isArf) {
+        this.$set(this.rootConfig, 'arr', form)
+        return
+      }
       for (let k in this.model) {
         if (Reflect.has(form, k)) this.$set(this.model, k, cloneDeep(form[k]))
         else {
@@ -531,6 +572,7 @@ export default {
           Reflect.deleteProperty(this.model, k)
         }
       }
+      this.$refs.arfForm?.[0].resetFieldsData()
     },
     /**对整个表单(不包括动态表单)进行重置，将所有字段值重置为初始值并移除校验结果*/
     resetFields (...args) {
@@ -608,11 +650,18 @@ export default {
           this.$emit('del-arf-item', row, item)
         }
       }).catch(() => { })
-
-    }
+    },
+    // 初始化组件
+    init () {
+      if (this._isArf) {
+        this.formData = this.copy(this.rootConfig.arr)
+      } else {
+        this.formData = this.copy(this.model || {})
+      }
+    },
   },
   created () {
-    this.formData = JSON.parse(JSON.stringify(this.model || {}))
+    this.init()
   }
 }
 </script>
