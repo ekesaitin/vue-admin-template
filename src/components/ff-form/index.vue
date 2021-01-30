@@ -1,7 +1,7 @@
 <template>
   <div class="ff-form">
     <el-form
-      v-bind="{ ...$attrs, ..._omit($props, 'config') }"
+      v-bind="{ ...$attrs, ...omit($props, 'config') }"
       v-on="$listeners"
       ref="form"
       :style="formStyle"
@@ -29,7 +29,7 @@
             >
               <el-col :span="23">
                 <ff-form
-                  v-bind="_omit(row, ['type', 'title', 'ref'])"
+                  v-bind="omit(row, ['type', 'title', 'ref'])"
                   ref="arfForm"
                   :model="arfItem"
                   :clearable="clearable"
@@ -76,7 +76,7 @@
         </el-collapse>
         <el-row
           v-else
-          v-bind="_omit(row, ['cols', 'className', 'slot'])"
+          v-bind="omit(row, ['cols', 'className', 'slot'])"
           :key="rowIdx"
           class="row"
           :class="row.className"
@@ -91,17 +91,15 @@
           <el-col
             v-else
             v-for="(col, colIdx) in row.cols"
-            v-bind="_omit(col, ['slot', 'className'])"
+            v-bind="omit(col, ['slot', 'className'])"
             :key="colIdx"
             :class="_getColClass(col)"
           >
             <el-form-item
               v-if="_haveComp(col)"
-              v-bind="_omit(col, ['slot', 'className', 'label', 'required'])"
+              v-bind="_getColProps(omit(col, ['slot', 'className']))"
               v-setMinWidth
               :class="_getItemClass(col.type)"
-              :label="_getItemLabel(col)"
-              :rules="_getItemRules(col)"
             >
               <slot
                 v-if="col.slot"
@@ -119,11 +117,9 @@
                   :$index="colIdx"
                 ></slot>
                 <component
-                  v-bind="_omit(col, ['slot', 'className'])"
+                  v-bind="_getColProps(omit(col, ['slot', 'className', 'clearable', 'type']))"
                   :model="model"
                   :is="_getCompName(col.type)"
-                  :label="_getItemLabel(col)"
-                  :placeholder="_getItemPlaceholder(col)"
                   :clearInMounted="clearInMounted"
                   :clearable="col.clearable === undefined ? clearable : col.clearable"
                 ></component>
@@ -434,7 +430,7 @@ export default {
     emitModelChange () {
       this.$emit('model-change')
     },
-    _omit: omit,
+    omit,
     /**
      * 动态表单改变后的回调
      * */
@@ -442,27 +438,6 @@ export default {
       if (row.onChange) {
         row.onChange(row.arr)
       }
-    },
-    /** 获取标签 */
-    _getItemLabel (col) {
-      const { label } = col
-      if (typeof label === 'function') {
-        if (this._isArf) return label(this._arfItem, col)
-        else return label(this.model, col)
-      } else {
-        return label
-      }
-    },
-    /**获取校验规则*/
-    _getItemRules (col) {
-      const { rules, required } = col
-      if (rules) {
-        if (typeof rules === 'function') {
-          if (this._isArf) return rules(this._arfItem, col)
-          else return rules(this.model, col)
-        } else return rules
-      }
-      else if (required) return this._getRequiredItemErrMsg(col)
     },
     /**
      * 根据表单项type、label生成占位文本
@@ -480,17 +455,6 @@ export default {
       else var startText = '请选择'
       return startText + label
     },
-    /**获取占位文本*/
-    _getItemPlaceholder (col) {
-      const { placeholder } = col
-      if (typeof placeholder === 'function') {
-        if (this._isArf) return placeholder(this._arfItem, col)
-        else return placeholder(this.model, col)
-      } else {
-        if (this.preFilledPlaceholder && placeholder === undefined) return this._getPlaceText(col)
-        else return placeholder
-      }
-    },
     /**
      * 获取必填校验文本
      * @param {object} col 当前项
@@ -503,6 +467,63 @@ export default {
       let { errMsg } = col
       const message = errMsg ? errMsg : this._getPlaceText(col)
       return { required: true, message, trigger: 'change' }
+    },
+    /**获取校验规则*/
+    _getItemRules (col) {
+      let { rules, required } = col
+      if (rules) {
+        if (typeof rules === 'function') {
+          if (this._isArf) rules = rules(this._arfItem, col)
+          else rules = rules(this.model, col)
+        }
+      }
+      if (required) {
+        const requiredRules = this._getRequiredItemErrMsg(col)
+        if (Array.isArray(rules) && rules.findIndex(r => Reflect.has(r, 'required')) === -1) return [requiredRules, ...rules]
+        else if (typeof rules === 'object' && !Reflect.has(rules, 'required')) return [requiredRules, rules]
+        else return requiredRules
+      } else {
+        return rules
+      }
+    },
+    /**
+     * 获取表单项配置
+     * @param {object} col 原配置
+     * @param {string | Function} key 配置名
+     * @returns {object} 扩展后的配置
+     */    
+    _getItemProp (col, key) {
+      const cfg = col[key]
+      if (typeof cfg === 'function') {
+        if (this._isArf) return cfg(this._arfItem, col)
+        else return cfg(this.model, col)
+      } else {
+        return cfg
+      }
+    },
+    /**
+     * 扩展表单项配置属性，使其支持字面量和函数
+     * @param {object} col 原配置
+     * @returns {object} 扩展后的表单项配置
+     */
+    _getColProps (col) {
+      Object.keys(col).forEach(key => {
+        if (!this.isEvent(key)) {
+          const ruleKeys = ['required', 'rules']
+          if (ruleKeys.includes(key)) col.rules = this._getItemRules(col)
+          else col[key] = this._getItemProp(col, key)
+        }
+      })
+      return omit(col, 'required')
+    },
+    /**
+     * 判断是不是 on-字母 组成的字符串
+     * @param {string} str 要判断的字符串
+     * @returns {boolean}
+     */
+    isEvent (str) {
+      const reg = /^on-([a-z\-]+)/
+      return reg.test(str)
     },
     /**获取组件名*/
     _getCompName (name) {

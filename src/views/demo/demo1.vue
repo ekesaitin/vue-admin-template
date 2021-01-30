@@ -22,7 +22,7 @@
 export default {
   name: 'demo1',
   data: () => ({
-    formdata: { aa: 'asdasda', arr: [{}] },
+    formdata: { arr: [{}] },
     arr: [{}],
     arr2: [{}],
     visible: false,
@@ -42,7 +42,13 @@ export default {
               span: 12,
               type: 'input',
               prop: 'aa',
-              label: 'inp'
+              label: (form, col) => {
+                return 'aa'
+              },
+              required: true,
+              rules: [
+                {max: 5, message: 'too long', trigger: ['change', 'blur']}
+              ]
             }
           ]
         },
@@ -65,9 +71,12 @@ export default {
                 },
                 {
                   span: 12,
-                  slot: 'pp1',
-                  prop: 'pp1',
+                  type: 'select',
+                  prop: 'pp2',
                   label: 'll1',
+                  placeholder: (form, col) => {
+                    return form.pp1
+                  }
                 }
               ]
             },

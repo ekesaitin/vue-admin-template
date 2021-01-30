@@ -6,8 +6,8 @@
     :title="_title"
     :visible.sync="_visible"
     :before-close="beforeClose"
-    @open="handleOpen"
-    @closed="handleClosed"
+    @opened="dialogOpened"
+    @closed="dialogClosed"
   >
     <ff-form
       v-bind="formProps"
@@ -55,16 +55,6 @@ export default {
     confirm: {
       type: Boolean,
       default: true
-    },
-    // 取消按钮文本
-    cancelText: {
-      type: String,
-      default: '取消'
-    },
-    // 确定按钮文本
-    confirmText: {
-      type: String,
-      default: '确定'
     },
   },
   data () {
@@ -131,7 +121,9 @@ export default {
       this.prompt = true
     },
     handleCancel () {
-      this._visible = false
+      this.beforeClose(() => {
+        this._visible = false
+      })
     },
     // 初始化组件
     init () {
@@ -146,11 +138,12 @@ export default {
       this.$refs.form?.resetFieldsAll(this._initialModel)
     },
     // Dialog 打开时的回调
-    handleOpen () {
+    dialogOpened () {
+      console.log(111)
       this.resetPrompt()
     },
     // Dialog 关闭动画结束时的回调
-    async handleClosed () {
+    async dialogClosed () {
       this.resetForm()
     }
   },
