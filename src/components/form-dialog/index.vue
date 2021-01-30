@@ -6,6 +6,7 @@
     :title="_title"
     :visible.sync="_visible"
     :before-close="beforeClose"
+    @open="handleOpen"
     @closed="handleClosed"
   >
     <ff-form
@@ -34,7 +35,7 @@ export default {
   props: {
     // 标题
     title: String,
-    // 表单操作类型，1:新增； 2:编辑； 其他:查看
+    // 表单操作类型，仅用来更改弹窗标题 1:新增； 2:编辑； 3:查看
     type: Number,
     // 表单数据
     model: {
@@ -77,13 +78,16 @@ export default {
   computed: {
     // dialog标题
     _title () {
-      let prefix = '查看'
+      let prefix = ''
       switch (this.type) {
         case 1:
           prefix = '新增'
           break;
         case 2:
           prefix = '编辑'
+          break;
+        case 3:
+          prefix = '查看'
           break;
       }
       return prefix + this.title
@@ -139,11 +143,14 @@ export default {
     },
     // 重置表单数据
     resetForm () {
-      this.$refs.form?.resetFieldsData(this._initialModel)
+      this.$refs.form?.resetFieldsAll(this._initialModel)
+    },
+    // Dialog 打开时的回调
+    handleOpen () {
+      this.resetPrompt()
     },
     // Dialog 关闭动画结束时的回调
-    handleClosed () {
-      this.resetPrompt()
+    async handleClosed () {
       this.resetForm()
     }
   },

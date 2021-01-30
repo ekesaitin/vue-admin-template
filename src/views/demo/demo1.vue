@@ -22,10 +22,11 @@
 export default {
   name: 'demo1',
   data: () => ({
-    formdata: { aa: 'asdasda' },
+    formdata: { aa: 'asdasda', arr: [{}] },
     arr: [{}],
+    arr2: [{}],
     visible: false,
-    type: 2
+    type: null
   }),
   computed: {
     config () {
@@ -48,6 +49,46 @@ export default {
         {
           type: 'arf',
           arr: this.arr,
+          // initialModel: [{}],
+          title: 'aaa',
+          hasEdit: true,
+          config: [
+            {
+              gutter: 20,
+              cols: [
+                {
+                  span: 12,
+                  type: 'input',
+                  prop: 'pp1',
+                  label: 'll1',
+                  opts: [...Array(3)].map((_, i) => ({ value: ++i, label: `opt${i}` }))
+                },
+                {
+                  span: 12,
+                  slot: 'pp1',
+                  prop: 'pp1',
+                  label: 'll1',
+                }
+              ]
+            },
+            {
+              gutter: 20,
+              cols: [
+                {
+                  span: 12,
+                  type: 'radio-group',
+                  prop: 'pp2',
+                  label: 'll2',
+                  opts: [...Array(3)].map((_, i) => ({ value: ++i, label: `opt${i}` }))
+                }
+              ]
+            }
+          ]
+        },
+        {
+          type: 'arf',
+          arr: this.arr2,
+          // initialModel: [{}],
           title: 'aaa',
           hasEdit: true,
           config: [

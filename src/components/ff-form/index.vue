@@ -125,7 +125,7 @@
                   :label="_getItemLabel(col)"
                   :placeholder="_getItemPlaceholder(col)"
                   :clearInMounted="clearInMounted"
-                  :clearable="col.clearable == undefined ? clearable : col.clearable"
+                  :clearable="col.clearable === undefined ? clearable : col.clearable"
                 ></component>
                 <slot
                   :name="col.appendSlot"
@@ -257,6 +257,7 @@
         }
  *    ]
  *
+ *  @param initialModel {object} 初始表单数据
  *  @param cancel {boolean} 是否显示关闭按钮
  *  @param confirm {boolean} 是否显示保存按钮
  *  @param cancelText {string} 关闭按钮文本
@@ -315,6 +316,9 @@ export default {
     model: {
       type: Object,
       required: true
+    },
+    initialModel: {
+      type: [Array, Object],
     },
     config: {
       type: Array,
@@ -382,7 +386,7 @@ export default {
   data () {
     return {
       compNames: Object.keys(components).map((v) => v.substring(3)), // 所有表单项组件名
-      formData: Object.create(null) // 初始表单
+      _initialModel: Object.create(null) // 初始表单
     }
   },
   computed: {
@@ -560,19 +564,26 @@ export default {
     },
     /**将表单字段重置为初始值*/
     resetFieldsData (initialModel) {
-      const form = this.copy(initialModel || this.formData)
+      initialModel = this.copy(initialModel || this._initialModel)
       if (this._isArf) {
-        this.$set(this.rootConfig, 'arr', form)
+        const arr = this.rootConfig.arr
+        arr.splice(0, initialModel.length)
+        initialModel.forEach((val, idx) => {
+          arr.splice(idx, 1, val)
+        })
         return
-      }
-      for (let k in this.model) {
-        if (Reflect.has(form, k)) this.$set(this.model, k, cloneDeep(form[k]))
-        else {
-          this.$delete(this.model, k)
-          Reflect.deleteProperty(this.model, k)
+      } else {
+        for (let k in this.model) {
+          if (Reflect.has(initialModel, k)) this.$set(this.model, k, cloneDeep(initialModel[k]))
+          else {
+            this.$delete(this.model, k)
+            Reflect.deleteProperty(this.model, k)
+          }
         }
       }
-      this.$refs.arfForm?.[0].resetFieldsData()
+      this.$refs.arfForm?.forEach(form => {
+        if (form._arfIdx === 0) form.resetFieldsData()
+      })
     },
     /**对整个表单(不包括动态表单)进行重置，将所有字段值重置为初始值并移除校验结果*/
     resetFields (...args) {
@@ -600,8 +611,8 @@ export default {
       return Promise.all(verifys)
     },
     /**对整个表单(包括动态表单)进行重置，将所有字段值重置为初始值并移除校验结果*/
-    resetFieldsAll () {
-      this.resetFieldsData()
+    resetFieldsAll (initialModel) {
+      this.resetFieldsData(initialModel)
       this.$nextTick(() => {
         this.clearValidateAll()
       })
@@ -654,9 +665,9 @@ export default {
     // 初始化组件
     init () {
       if (this._isArf) {
-        this.formData = this.copy(this.rootConfig.arr)
+        this._initialModel = this.copy(this.initialModel || this.rootConfig.arr)
       } else {
-        this.formData = this.copy(this.model || {})
+        this._initialModel = this.copy(this.initialModel || this.model || Object.create(null))
       }
     },
   },
