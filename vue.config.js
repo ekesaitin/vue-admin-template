@@ -1,5 +1,6 @@
 module.exports = {
-  publicPath: process.env.NODE_ENV === 'development' ? '/' : './',
+  // publicPath: process.env.NODE_ENV === 'development' ? '/' : './',
+  publicPath: '/',
   outputDir: 'dist',
   assetsDir: 'static',
   lintOnSave: false,

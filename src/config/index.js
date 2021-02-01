@@ -2,7 +2,7 @@
  * 全局设置
  * @Author: 贰伍伍
  * @Email: ouhuangff@163.com
- * @LastEditTime: 2021-01-28 16:36:15
+ * @LastEditTime: 2021-02-01 11:26:17
  */
 
  
@@ -14,8 +14,8 @@
  */
 const baseUrlObj = {
   development: '/mockapi',
-  production: '//localhost:3000',
-  test: '//localhost:3000'
+  production: '/mockapi',
+  test: '/mockapi'
 }
 
 /**
