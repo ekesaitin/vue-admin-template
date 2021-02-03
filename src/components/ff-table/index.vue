@@ -136,7 +136,7 @@ export default {
 }
 </script>
 
-<style scoped lang="postcss">
+<style scoped lang="scss">
   .table-footer {
     text-align: right;
     margin-top: 22px;
@@ -146,24 +146,16 @@ export default {
     display: flex;
     align-items: center;
 
-    & .handle-item {
+    .handle-item {
       cursor: pointer;
 
       & + .handle-item {
         margin-left: 20px;
       }
 
-      & i {
+      i {
         font-size: 14px;
         margin-right: 6px;
-      }
-    }
-  }
-
-  .ff-table {
-    & >>> .dark-row {
-      & th, & td {
-        background-color: var(--text-color-05) !important;
       }
     }
   }

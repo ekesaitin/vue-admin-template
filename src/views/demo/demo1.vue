@@ -25,7 +25,7 @@ export default {
     formdata: { arr: [{}] },
     arr: [{}],
     arr2: [{}],
-    visible: false,
+    visible: true,
     type: null
   }),
   computed: {
@@ -40,15 +40,12 @@ export default {
             },
             {
               span: 12,
-              type: 'input',
+              type: 'radio-group',
+              // kind: 'daterange',
               prop: 'aa',
-              label: (form, col) => {
-                return 'aa'
-              },
+              label: 'aa',
               required: true,
-              rules: [
-                {max: 5, message: 'too long', trigger: ['change', 'blur']}
-              ]
+              opts: [...Array(3)].map((_, i) => ({ value: ++i, label: `opt${i}` }))
             }
           ]
         },

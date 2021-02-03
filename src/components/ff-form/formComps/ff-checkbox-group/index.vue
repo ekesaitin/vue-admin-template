@@ -50,7 +50,7 @@
   }
 </script>
 
-<style scoped lang="postcss">
+<style scoped lang="scss">
   .ff-checkbox-group {
     position: relative;
     display: inline-block;

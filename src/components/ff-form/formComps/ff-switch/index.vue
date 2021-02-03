@@ -35,30 +35,6 @@
   }
 </script>
 
-<style scoped lang="postcss">
-  .ff-switch {
-    & >>> .el-switch__core {
-      width:54px !important;
-      height:20px !important;
-      border-radius:32px !important;
-    
-      &::after {
-        width:26px;
-        height:26px;
-        box-shadow:0px 3px 6px rgba(0,0,0,0.16);
-        border-radius:32px;
-        top: -4px;
-        left: -1px;
-      }
-    }
+<style scoped lang="scss">
   
-    &.is-checked >>> .el-switch__core {
-      background-color: var(--primary-color);
-      border-color: var(--primary-color);
-  
-      &::after {
-        left: 86% !important;
-      }
-    }
-  }
 </style>

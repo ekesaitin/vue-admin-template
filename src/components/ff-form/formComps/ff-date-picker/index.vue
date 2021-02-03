@@ -31,11 +31,11 @@
   }
 </script>
 
-<style scoped lang="postcss">
+<style scoped lang="scss">
   .ff-date-picker {
     width: 100% !important;
     
-    & >>> .el-range-input {
+    & ::v-deep .el-range-input {
       background-color: transparent;
     }
   }

@@ -38,35 +38,6 @@
   }
 </script>
 
-<style scoped lang="postcss">
- .ff-radio-group {
-   & >>> .is-checked {
-     & .el-radio__inner {
-       border:3px solid var(--primary-color);
-       background-color: #fff;
-      
-       &::after {
-         width:14px;
-         height:14px;
-         background:var(--primary-color);
-         border-radius:20px;
-       }
-     }
-   }
-  
-   & >>> .el-radio__inner {
-     width:30px;
-     height:30px;
-     border:3px solid var(--primary-color-4);
-     border-radius:20px;
-   }
-  
-   & >>> .el-radio__label {
-     font-size: 15px;
-   }
-   
-   & >>> .el-radio__input.is-checked+.el-radio__label {
-     color: var(--text-color);
-   }
- }
+<style scoped lang="scss">
+
 </style>

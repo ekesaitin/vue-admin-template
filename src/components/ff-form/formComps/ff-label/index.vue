@@ -11,6 +11,6 @@
   }
 </script>
 
-<style scoped lang="postcss">
+<style scoped lang="scss">
 
 </style>

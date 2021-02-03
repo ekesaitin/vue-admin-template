@@ -26,7 +26,7 @@
   }
 </script>
 
-<style scoped lang="postcss">
+<style scoped lang="scss">
   .ff-cascader {
     width: 100%;
   }

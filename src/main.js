@@ -17,7 +17,7 @@ Vue.use(Fragment.Plugin)
 import './components'
 import './style/reset.css'
 
-// 自定义插件
+// 全局混入
 import globalMixin from './globalMixin'
 Vue.use(globalMixin)
 

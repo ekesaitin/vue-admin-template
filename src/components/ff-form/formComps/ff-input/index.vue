@@ -104,7 +104,7 @@
   }
 </script>
 
-<style scoped lang="postcss">
+<style scoped lang="scss">
   .prefix {
     position: absolute;
     top: 50%;
