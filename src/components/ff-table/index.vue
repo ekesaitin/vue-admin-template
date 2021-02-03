@@ -1,23 +1,37 @@
 <template>
   <div class="ff-table">
+    <div class="ff-table-header" :style="headerStyle">
+      <div class="left" :style="headerLeftStyle"><slot name="left"></slot></div>
+      <div class="right" :style="headerRightStyle"><slot name="right"></slot></div>
+    </div>
     <el-table v-bind="allProps" :data="tableData">
+      <el-table-column v-if="selection" type="selection" width="55"></el-table-column>
       <el-table-column
         v-for="(item, index) in columns"
         :key="index"
         v-bind="omit(item, 'slot')"
       >
-        <template v-if="item.slot" #default="scope">
-          <slot v-bind="scope" :name="item.slot"></slot>
+        <template #default="scope">
+          <slot v-if="item.slot" v-bind="scope" :name="item.slot"></slot>
+          <span v-else>{{scope.row[item.prop]}}</span>
         </template>
       </el-table-column>
       <el-table-column v-if="edit || del" label="操作">
         <template #default="{ row }">
           <div class="handle-col">
-            <div v-if="edit" class="handle-item" @click="handleClick(row, 'edit')">
+            <div
+              v-if="edit"
+              class="handle-item"
+              @click="handleClick(row, 'edit')"
+            >
               <i class="iconfont icon-tool_edit"></i>
               <span>编辑</span>
             </div>
-            <div v-if="del" class="handle-item" @click="handleClick(row, 'del')">
+            <div
+              v-if="del"
+              class="handle-item"
+              @click="handleClick(row, 'del')"
+            >
               <i class="iconfont icon-icon_delete2"></i>
               <span>删除</span>
             </div>
@@ -43,6 +57,22 @@
 
 <script>
 import { pick } from 'lodash'
+
+/**
+ * @typedef {object} HeaderChild
+ * @property {string|number} col
+ * @property {string} colW
+ * @property {string|number} row
+ * @property {string} rowW
+ */
+
+/**
+ * @typedef {object} Styles 
+ * @property {{leftW: string, rightW: string}} header
+ * @property {HeaderChild} left
+ * @property {HeaderChild} right
+ */
+
 export default {
   name: 'FfTable',
   props: {
@@ -64,7 +94,18 @@ export default {
     paging: Boolean,
     // 分页配置
     pagingConfig: Object,
-    handle: String
+    // 操作栏
+    handle: String,
+    // 是否多选
+    selection: {
+      type: Boolean,
+      default: true
+    },
+    /**
+     * 组件样式配置
+     * @type {Styles}
+     */
+    styles: Object
   },
   data: () => ({
     apiData: [],
@@ -79,6 +120,29 @@ export default {
     },
     del () {
       return this.handle?.includes('del') || false
+    },
+    headerStyle () {
+      const s = this.styles?.header || {}
+      const {leftW = '1fr', rightW = 'auto'} = s
+      return {
+        gridTemplateColumns: `${leftW} ${rightW}`
+      }
+    },
+    headerLeftStyle () {
+      const s = this.styles?.left || {}
+      const {col = 'auto-fill', colW = 'auto', row = 1, rowW = '40px'} = s
+      return {
+        gridTemplateColumns: `repeat(${col}, ${colW})`,
+        gridTemplateRows: `repeat(${row}, ${rowW})`
+      }
+    },
+    headerRightStyle () {
+      const s = this.styles?.right || {}
+      const {col = 'auto-fill', colW = 'auto', row = 1, rowW = '40px'} = s
+      return {
+        gridTemplateColumns: `repeat(${col}, ${colW})`,
+        gridTemplateRows: `repeat(${row}, ${rowW})`
+      }
     }
   },
   methods: {
@@ -88,6 +152,7 @@ export default {
     },
     // 合并请求参数
     mergeParams (params) {
+      if (!params || typeof params !== 'object') return
       const paramsArr = Object.entries({ ...this.params, ...params }).filter(([k, v]) => v)
       this.params = Object.fromEntries(paramsArr)
     },
@@ -105,10 +170,11 @@ export default {
      * @param {boolean} resetCurr 是否重置回第一页
      * @param {object} params 请求参数
      * @returns {Promise<void>}
-     */    
+     */
     async getData (resetCurr = false, params) {
       try {
         if (this.api) {
+          this.mergeParams(this.apiParams)
           if (params) this.mergeParams(params)
           if (resetCurr) this.params.current = 1
           const { data } = await this.useApi(this.api, this.params)
@@ -137,6 +203,25 @@ export default {
 </script>
 
 <style scoped lang="scss">
+  .ff-table-header {
+    display: grid;
+    column-gap: 40px;
+    margin-bottom: 20px;
+
+    .left, .right {
+      display: grid;
+      gap: 10px;
+    }
+
+    .right {
+      justify-content: end;
+    }
+
+    .el-button + .el-button {
+      margin-left: 0;
+    }
+  }
+
   .table-footer {
     text-align: right;
     margin-top: 22px;
