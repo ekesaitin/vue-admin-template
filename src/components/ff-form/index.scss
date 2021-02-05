@@ -36,17 +36,17 @@
       font-weight: 400;
       padding: 8px 0;
     }
+
+    // .arf-collapse-item ::v-deep .el-collapse-item__content {
+    //   text-align: right;
+    // }
     
     .arf-icon {
-      font-size: 20px;
       cursor: pointer;
+      align-self: flex-start;
 
-      &.el-icon-remove {
-        color: #e57470;
-      }
-
-      &.el-icon-circle-plus {
-        color: #4091f7;
+      &.edit, &.del {
+        margin-top: 6px;
       }
     }
 

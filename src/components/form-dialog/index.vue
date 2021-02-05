@@ -14,6 +14,9 @@
       v-on="formEvents"
       ref="form"
       :model="model"
+      :disabled="type === 3"
+      :cancel="_cancel"
+      :confirm="_confirm"
       @model-change="modelChange"
       @cancel="handleCancel"
     >
@@ -62,7 +65,9 @@ export default {
       // 关闭前是否提示保存
       prompt: false,
       // 表单初始值
-      _initialModel: {}
+      _initialModel: {},
+      _cancel: true,
+      _confirm: true,
     }
   },
   computed: {
@@ -108,6 +113,36 @@ export default {
       return this.omit(this.$listeners, dialogEventKeys)
     }
   },
+  watch: {
+    cancel: {
+      handler (b) {
+        this._cancel = b
+      },
+      immediate: true
+    },
+    confirm: {
+      handler (b) {
+        this._confirm = b
+      },
+      immediate: true
+    },
+    type: {
+      handler (t) {
+        switch (t) {
+          case 1:
+          case 2:
+            this._confirm = true
+            this._cancel = true
+            break;
+          case 3:
+            this._confirm = false
+            this._cancel = false
+            break
+        }
+      },
+      immediate: true
+    }
+  },
   methods: {
     // 关闭前的回调，会暂停 Dialog 的关闭
     beforeClose (done) {
@@ -128,6 +163,7 @@ export default {
     // 初始化组件
     init () {
       this._initialModel = this.copy(this.initialModel ?? this.model)
+      this.resetPrompt()
     },
     // 重置提示判断
     resetPrompt () {
@@ -139,7 +175,6 @@ export default {
     },
     // Dialog 打开时的回调
     dialogOpened () {
-      console.log(111)
       this.resetPrompt()
     },
     // Dialog 关闭动画结束时的回调

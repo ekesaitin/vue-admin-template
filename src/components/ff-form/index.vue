@@ -18,6 +18,7 @@
             :title="row.title"
             :name="row.title + rowIdx"
             accordion
+            class="arf-collapse-item"
           >
             <el-row
               v-for="(arfItem, arfIdx) in row.arr"
@@ -49,6 +50,7 @@
               </el-col>
               <el-button
                 v-if="row.hasEdit"
+                class="arf-icon edit"
                 type="primary"
                 icon="el-icon-edit"
                 circle
@@ -57,6 +59,7 @@
               ></el-button>
               <el-button
                 v-if="!row.noDel && (row.min == null || row.arr.length > row.min)"
+                class="arf-icon del"
                 type="danger"
                 icon="el-icon-delete"
                 circle
@@ -66,6 +69,7 @@
             </el-row>
             <el-button
               v-if="!row.noAdd && (row.max == null || row.max > row.arr.length)"
+              class="arf-icon add"
               type="primary"
               icon="el-icon-plus"
               circle
@@ -120,6 +124,7 @@
                   v-bind="_getColProps(omit(col, ['slot', 'className', 'clearable', 'type']))"
                   :model="model"
                   :is="_getCompName(col.type)"
+                  :placeholder="_getItemPlaceholder(col)"
                   :clearInMounted="clearInMounted"
                   :clearable="col.clearable === undefined ? clearable : col.clearable"
                 ></component>
@@ -279,13 +284,6 @@
 import { omit, cloneDeep } from 'lodash'
 import components from './formComps'
 
-/**
- * 将简化的单行配置转为组件可用的config格式
- * @param {object[]} config 单行配置
- * @return {object[]}
- */
-export const formatSingleConfig = config => config.map(cfg => ({ cols: [{ span: 24, ...cfg }] }))
-
 export default {
   name: 'FfForm',
   inheritAttrs: false,
@@ -366,7 +364,7 @@ export default {
     },
     preFilledPlaceholder: {
       type: Boolean,
-      default: false
+      default: true
     },
     _isArf: { // 动态表单，为真则不设置左右padding
       type: Boolean,
@@ -484,6 +482,17 @@ export default {
         else return requiredRules
       } else {
         return rules
+      }
+    },
+    /**获取占位文本*/
+    _getItemPlaceholder (col) {
+      const { placeholder } = col
+      if (typeof placeholder === 'function') {
+        if (this._isArf) return placeholder(this._arfItem, col)
+        else return placeholder(this.model, col)
+      } else {
+        if (this.preFilledPlaceholder && placeholder === undefined) return this._getPlaceText(col)
+        else return placeholder
       }
     },
     /**

@@ -1,6 +1,6 @@
 <template>
   <div class="demo3-1">
-    <ff-table :columns="columns" api="demoApi/getPageList" paging>
+    <ff-table :columns="columns" api="demoApi/getPageList" paging handle="edit,del">
       <template #email="{ row }">
         <a :href="row.email">{{row.email}}</a>
       </template>

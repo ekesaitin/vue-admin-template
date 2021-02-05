@@ -12,5 +12,5 @@ export const getList = (params) => {
 
 // pageList
 export const getPageList = (params) => {
-    return axios.get(`pageList`, { params }).then(res => res.data)
+    return axios.get(`pageList`, { params }).then(res => res.data.data)
 }

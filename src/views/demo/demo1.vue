@@ -25,7 +25,7 @@ export default {
     formdata: { arr: [{}] },
     arr: [{}],
     arr2: [{}],
-    visible: true,
+    visible: false,
     type: null
   }),
   computed: {

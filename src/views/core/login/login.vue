@@ -1,21 +1,27 @@
 <template>
   <div class="login">
-    <ff-form
+    <el-form
       ref="loginForm"
       :model="form"
-      :config="config"
-      labelWidth="0"
-      :hideRequiredAsterisk="false"
+      :rules="rules"
+      label-width="80px"
+      label-position="top"
+      hide-required-asterisk
     >
-      <template #prependBtn>
+      <el-form-item label="用户名" prop="username">
+        <el-input v-model="form.username"></el-input>
+      </el-form-item>
+      <el-form-item label="密码" prop="passwd">
+        <el-input v-model="form.passwd"></el-input>
+      </el-form-item>
+      <el-form-item label-width="0">
         <el-button type="primary" @click="handleLogin" style="width: 100%;">登 录</el-button>
-      </template>
-    </ff-form>
+      </el-form-item>
+    </el-form>
   </div>
 </template>
 
 <script>
-import { formatSingleConfig } from '@/components/ff-form/index'
 export default {
   name: 'login',
   data () {
@@ -26,10 +32,14 @@ export default {
         username: '',
         passwd: ''
       },
-      config: formatSingleConfig([
-        { type: 'input', prop: 'username', placeholder: '请输入用户名', required, errMsg: '请输入用户名' },
-        { type: 'input', prop: 'passwd', placeholder: '请输入用户密码', kind: 'password', required, errMsg: '请输入用户密码' }
-      ]),
+      rules: {
+        username: [
+          { required, message: '请输入用户名', trigger: 'blur' }
+        ],
+        passwd: [
+          { required, message: '请输入密码', trigger: 'blur' }
+        ],
+      }
     }
   },
   methods: {
